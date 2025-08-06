@@ -1,0 +1,24 @@
+        /* Custom styles for fonts and animations */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        .fab-button {
+            transition: all 0.3s ease-in-out;
+        }
+        .fab-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        /* Style for printing */
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
