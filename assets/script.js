@@ -1,3 +1,9 @@
+        // Initialize AOS
+        AOS.init({
+            once: true, // Whether animation should happen only once - while scrolling down
+            anchorPlacement: 'top-bottom', // Defines which position of the element regarding to window should trigger the animation
+        });
+
         // PDF Generation Logic
         document.getElementById('downloadPdf').addEventListener('click', function () {
             const element = document.getElementById('cv-content');
