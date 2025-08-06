@@ -12,13 +12,51 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/style.css">
     
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- AOS (Animate On Scroll) Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- jsPDF and html2canvas for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* Custom styles for fonts and animations */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        .fab-button {
+            transition: all 0.3s ease-in-out;
+        }
+        .fab-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        /* Added hover effect for cards */
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        /* Style for printing */
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
@@ -168,11 +206,51 @@
         </button>
     </div>
     
-<script src="assets/script.js"></script>
-<!-- AOS (Animate On Scroll) Library -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<!-- jsPDF and html2canvas for PDF Generation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- AOS (Animate On Scroll) Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            once: true, // Whether animation should happen only once - while scrolling down
+            anchorPlacement: 'top-bottom', // Defines which position of the element regarding to window should trigger the animation
+        });
+
+        // PDF Generation Logic
+        document.getElementById('downloadPdf').addEventListener('click', function () {
+            const element = document.getElementById('cv-content');
+            const originalButtonContent = this.innerHTML;
+            this.innerHTML = `<i class="fas fa-spinner fa-spin text-2xl"></i>`;
+            this.disabled = true;
+
+            html2canvas(element, {
+                scale: 2,
+                useCORS: true
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const canvasAspectRatio = canvas.width / canvas.height;
+                let imgWidth = pdfWidth;
+                let imgHeight = pdfWidth / canvasAspectRatio;
+                if (imgHeight > pdfHeight) {
+                    imgHeight = pdfHeight;
+                    imgWidth = imgHeight * canvasAspectRatio;
+                }
+                const x = (pdfWidth - imgWidth) / 2;
+                const y = (pdfHeight - imgHeight) / 2;
+                pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+                pdf.save('CV_Constanza_Murua.pdf');
+                this.innerHTML = originalButtonContent;
+                this.disabled = false;
+            }).catch(err => {
+                console.error("Error al generar PDF:", err);
+                alert("Hubo un error al generar el PDF. Por favor, intente de nuevo.");
+                this.innerHTML = originalButtonContent;
+                this.disabled = false;
+            });
+        });
+    </script>
 </body>
 </html>
